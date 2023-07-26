@@ -1,0 +1,71 @@
+Sub SendEmails()
+
+'Declare variables
+Dim ws As Worksheet
+Dim cell As Range
+Dim subject As String
+Dim body As String
+Dim toAddress As String
+Dim ccAddress As String
+Dim sentEmails As New Collection
+Dim count As Long
+Dim lastEmailSent As String
+
+'Set the worksheet
+Set ws = ThisWorkbook.Sheets("Sheet1")
+
+'Loop through the cells in the first column
+For Each cell In ws.Range("A1:A10")
+
+'Get the subject line
+subject = "Sua nota # " & cell.Offset(1, 0).Value & " acabou de ser despachada."
+
+'Get the body of the message
+body = "Olá cliente, sua nota # " & cell.Offset(1, 0).Value & " acabou de ser despachada."
+
+'Get the recipient's email address
+toAddress = cell.Offset(2, 0).Value
+
+'Get the carbon copy email address
+ccAddress As String
+
+'Check if the email has already been sent
+If sentEmails.Exists(toAddress) Then
+
+'The email has already been sent, so skip it
+Continue For
+
+End If
+
+'Send the email
+Application.Mail.SendMail toAddress, subject, body, ccAddress
+
+'Add the email to the sent emails collection
+sentEmails.Add toAddress
+
+count = count + 1
+
+If count = 30 Then
+
+'Pause for 1 minute
+WScript.Sleep 60000
+
+'Reset the counter
+count = 0
+
+End If
+
+'Check if the current email is the same as the last email sent
+If toAddress = lastEmailSent Then
+
+'The current email is the same as the last email sent, so skip it
+Continue For
+
+End If
+
+'Set the last email sent
+lastEmailSent = toAddress
+
+Next cell
+
+End Sub
